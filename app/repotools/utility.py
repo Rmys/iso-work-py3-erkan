@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
 # Copyright (C) 2005-2009, TUBITAK/UEKAE
@@ -13,6 +13,23 @@
 
 import os
 import sys
+import subprocess
+import re
+
+def strip_ansi(text):
+    ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+    return ansi_escape.sub('', text)
+
+def run(cmd, ignore_error=False):
+    print(cmd)
+    try:
+        ret = subprocess.run(cmd, shell=True, check=not ignore_error)
+        return ret.returncode
+    except subprocess.CalledProcessError as e:
+        print("%s returned %s" % (cmd, e.returncode))
+        if not ignore_error:
+            sys.exit(1)
+        return e.returncode
 
 def I18N_NOOP(x):
     return x
@@ -23,14 +40,14 @@ def size_fmt(size):
         return "0"
     while size > 0:
         parts.append("%03d" % (size % 1000))
-        size /= 1000
+        size //= 1000
     parts.reverse()
     tmp = ".".join(parts)
     return tmp.lstrip("0")
 
 def xterm_title(message):
     """Set message as console window title."""
-    if os.environ.has_key("TERM") and sys.stderr.isatty():
+    if "TERM" in os.environ and sys.stderr.isatty():
         terminalType = os.environ["TERM"]
         for term in ["xterm", "Eterm", "aterm", "rxvt", "screen", "kterm", "rxvt-unicode"]:
             if terminalType.startswith(term):

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
 # Copyright (C) 2005-2009, TUBITAK/UEKAE
@@ -16,21 +16,20 @@ import os
 import tempfile
 
 # Qt
-import QTermWidget
+try:
+    import QTermWidget
+    HAS_QTERMWIDGET = True
+except ImportError:
+    HAS_QTERMWIDGET = False
 
-from PyQt5.QtWidgets import (QMessageBox, QMainWindow, QFileDialog,
-                             QListWidgetItem, QAction)
-from PyQt5.QtGui import QFont  # QIcon,
-from PyQt5.QtCore import Qt  # pyqtSignal, QFile,
+from PyQt6.QtWidgets import (QMessageBox, QMainWindow, QFileDialog,
+                             QListWidgetItem, QPlainTextEdit)
+from PyQt6.QtGui import QFont, QTextCursor, QAction
+from PyQt6.QtCore import Qt, QProcess
 
 
 # UI
-
-# eski kullanıcı arayüzü
-# from gui.ui.main import Ui_MainWindow
-
-# yeni kullanıcı arayüzü
-from app.gui.ui.mainv2 import Ui_MainWindow
+from PyQt6 import uic
 
 
 # Dialogs
@@ -44,11 +43,49 @@ from app.gui.progress import Progress
 # Repository tools
 from app.repotools.packages import (Repository, ExIndexBogus, ExPackageCycle,
                                 ExPackageMissing, fetch_uri)
+from app.repotools.utility import strip_ansi
 from app.repotools.project import Project, ExProjectMissing, ExProjectBogus
 
 import gettext
+import locale
 
-_ = lambda x: gettext.ldgettext("pardusman", x)
+# Setup gettext for i18n
+# Get project root (where pisiman.py is located)
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+locale_dir = os.path.join(project_root, 'locale')
+
+# Try to use system locale, fallback to English
+try:
+    # Check if we have a locale set
+    current_lang = os.environ.get('LANGUAGE') or os.environ.get('LANG', '')
+    
+    # If running under sudo, LANG might be reset, so try to detect from user's locale
+    if not current_lang or current_lang.startswith('en'):
+        try:
+            # Try to get user's actual locale
+            import subprocess
+            result = subprocess.run(['locale'], capture_output=True, text=True)
+            for line in result.stdout.split('\n'):
+                if line.startswith('LANG='):
+                    user_lang = line.split('=')[1].strip('"')
+                    if user_lang and not user_lang.startswith('en'):
+                        current_lang = user_lang
+                    break
+        except:
+            pass
+    
+    # Set LANGUAGE environment variable for gettext
+    if current_lang:
+        lang_code = current_lang.split('.')[0]  # tr_TR.UTF-8 -> tr_TR
+        os.environ['LANGUAGE'] = lang_code
+    
+    locale.setlocale(locale.LC_ALL, '')
+except:
+    pass
+
+gettext.bindtextdomain('pisiman', locale_dir)
+gettext.textdomain('pisiman')
+_ = gettext.gettext
 
 
 def get_finished_status(project):
@@ -69,23 +106,63 @@ class PackageCollectionListItem(QListWidgetItem):
         self.setText(collection.translations[language][0])
 
 
-class MainWindow(QMainWindow, Ui_MainWindow):
+class TerminalFallback(QPlainTextEdit):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setReadOnly(True)
+        self.process = QProcess(self)
+        self.process.readyReadStandardOutput.connect(self.read_stdout)
+        self.process.readyReadStandardError.connect(self.read_stderr)
+
+    def read_stdout(self):
+        data = self.process.readAllStandardOutput().data().decode('utf-8', errors='ignore')
+        self.append_text(data)
+
+    def read_stderr(self):
+        data = self.process.readAllStandardError().data().decode('utf-8', errors='ignore')
+        self.append_text(data)
+
+    def append_text(self, text):
+        self.moveCursor(QTextCursor.MoveOperation.End)
+        self.insertPlainText(strip_ansi(text))
+        self.moveCursor(QTextCursor.MoveOperation.End)
+
+    def sendText(self, text):
+        if text.endswith('\n'):
+            cmd = text.strip()
+            # If a process is already running, we might need a better way, 
+            # but for one-shot commands this is fine.
+            self.process.start("sh", ["-c", cmd])
+
+    def setHistorySize(self, size): pass
+    def setScrollBarPosition(self, pos): pass
+    def setTerminalFont(self, font): self.setFont(font)
+    def setColorScheme(self, scheme): pass
+
+
+class MainWindow(QMainWindow):
     def __init__(self, args):
         QMainWindow.__init__(self)
-        self.setupUi(self)
+        ui_path = os.path.join(os.path.dirname(__file__), "ui", "mainv2.ui")
+        uic.loadUi(ui_path, self)
         self.title = "Pisiman"
         # Terminal
-
-        self.terminal = QTermWidget.QTermWidget()
-        self.terminal.setHistorySize(-1)
-        self.terminal.setScrollBarPosition(2)
-        # self.terminal.setColorScheme(0)
-        font = QFont("Droid Sans Mono")  # DejaVu Sans Mono")#Oxygen Mono")
-        font.setPointSize(10)
-        self.terminal.setTerminalFont(font)
-
-        self.terminal.setColorScheme(
-            "/usr/share/qtermwidget5/color-schemes/BreezeModified.colorscheme")
+        if HAS_QTERMWIDGET:
+            self.terminal = QTermWidget.QTermWidget()
+            self.terminal.setHistorySize(-1)
+            self.terminal.setScrollBarPosition(2)
+            font = QFont("Droid Sans Mono")
+            font.setPointSize(10)
+            self.terminal.setTerminalFont(font)
+            self.terminal.setColorScheme(
+                "/usr/share/qtermwidget5/color-schemes/BreezeModified.colorscheme")
+        else:
+            self.terminal = TerminalFallback()
+            font = QFont("Monospace")
+            font.setStyleHint(QFont.StyleHint.Monospace)
+            font.setPointSize(10)
+            self.terminal.setTerminalFont(font)
+            self.terminal.setStyleSheet("background-color: #2e3436; color: #eeeeec;")
 
         self.terminalLayout.addWidget(self.terminal)
         self.terminal.show()
@@ -115,8 +192,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.actionUpdateRepo.triggered.connect(self.slotUpdateRepo)
         self.actionLanguages.triggered.connect(self.slotSelectLanguages)
         self.actionPackages.triggered.connect(self.slotSelectPackages)
-        self.actionInstallationImagePackages.triggered.connect(
-            self.slotSelectInstallImagePackages)
+        self.actionMakeImage.triggered.connect(self.slotMakeImage)
         self.actionMakeImage.triggered.connect(self.slotMakeImage)
 
         self.actionMake_Repo.triggered.connect(self.slotMakeRepo)
@@ -181,7 +257,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         if not filename:
             filename = QFileDialog.getOpenFileName(
-                self, _("Select project file"), "../project-files",
+                self, _("Select project file"), os.path.join(os.getcwd(), "project-files"),
                 "Xml Files (*.xml)")
             filename = filename[0]
         if filename:
@@ -215,10 +291,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             "Save As..." menu item fires this function.
         """
         filename = QFileDialog.getSaveFileName(
-            self, _("Save project"), "../project-files", "Xml Files (*.xml)")
+            self, _("Save project"), os.path.join(os.getcwd(), "project-files"), "Xml Files (*.xml)")
         filename = filename[0]
         if filename:
-            self.project.filename = unicode(filename)
+            self.project.filename = str(filename)
             self.slotSave()
 
     def get_path(self, text):
@@ -264,7 +340,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             "Pisi Index Files(*-index.xml *-index.xml.xz)")
         filename = filename[0]
         if filename:
-            filename = unicode(filename)
+            filename = str(filename)
             if filename.startswith("/"):
                 filename = "file://%s" % filename
             self.lineRepository.setText(filename)
@@ -311,7 +387,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             return
 
         dialog = PackageCollectionDialog(self, self.repo, self.project)
-        if dialog.exec_():
+        if dialog.exec():
             item = PackageCollectionListItem(
                 self.listPackageCollection, dialog.collection,
                 self.project.default_language)
@@ -330,7 +406,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         dialog = PackageCollectionDialog(
             self, self.repo, self.project, item.collection)
-        if dialog.exec_():
+        if dialog.exec():
             if not item.collection._id == dialog.collection._id:
                 item.setText(
                     dialog.collection.translations[
@@ -361,7 +437,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.listPackageCollection.currentItem(
             ).collection.default = "True"
             currentIndex = self.listPackageCollection.currentRow()
-            for index in xrange(self.listPackageCollection.count()):
+            for index in range(self.listPackageCollection.count()):
                 if index == currentIndex:
                     pass
                 else:
@@ -371,7 +447,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.pushSetDefaultCollection.setChecked(True)
 
     def slotShowPackageCollection(self, state):
-        if state == Qt.Checked:
+        if state == Qt.CheckState.Checked:
             # self.collectionFrame.show()
             self.actionPackages.setVisible(False)
         else:
@@ -383,7 +459,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             "Languages..." menu item fires this function.
         """
         dialog = LanguagesDialog(self, self.project.selected_languages)
-        if dialog.exec_():
+        if dialog.exec():
             self.project.default_language = dialog.languages[0]
             self.project.selected_languages = dialog.languages
 
@@ -401,29 +477,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self, self.repo, self.project.selected_packages,
             self.project.selected_components)
 
-        if dialog.exec_():
+        if dialog.exec():
             self.project.selected_packages = dialog.packages
             self.project.selected_components = dialog.components
             self.project.all_packages = dialog.all_packages
 
-    def slotSelectInstallImagePackages(self):
-        """
-            "Installation Image Packages..." menu item fires this function.
-        """
-        if not self.repo:
-            if not self.checkProject():
-                return
-            if not self.updateRepo():
-                return
-
-        dialog = PackagesDialog(
-            self, self.repo, self.project.selected_install_image_packages,
-            self.project.selected_install_image_components)
-
-        if dialog.exec_():
-            self.project.selected_install_image_packages = dialog.packages
-            self.project.selected_install_image_components = dialog.components
-            self.project.all_install_image_packages = dialog.all_packages
 
     def slotUpdateRepo(self):
         """
@@ -604,7 +662,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def updateCollection(self):
         self.project.package_collections = []
-        for index in xrange(self.listPackageCollection.count()):
+        for index in range(self.listPackageCollection.count()):
             self.project.package_collections.append(
                 self.listPackageCollection.item(index).collection)
 
@@ -630,18 +688,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
             Updates project information.
         """
-        self.project.title = unicode(self.lineTitle.text())
-        self.project.repo_uri = unicode(self.lineRepository.text())
-        self.project.work_dir = unicode(self.lineWorkFolder.text())
-        self.project.live_repo_uri = unicode(self.lineLiveIsoRepo.text())
-        self.project.release_files = unicode(self.lineReleaseFiles.text())
-        self.project.plugin_package = unicode(self.linePluginPackage.text())
-        self.project.extra_params = unicode(self.lineParameters.text())
+        self.project.title = str(self.lineTitle.text())
+        self.project.repo_uri = str(self.lineRepository.text())
+        self.project.work_dir = str(self.lineWorkFolder.text())
+        self.project.live_repo_uri = str(self.lineLiveIsoRepo.text())
+        self.project.release_files = str(self.lineReleaseFiles.text())
+        self.project.plugin_package = str(self.linePluginPackage.text())
+        self.project.extra_params = str(self.lineParameters.text())
         self.project.type = ["install", "live"][self.comboType.currentIndex()]
         self.project.squashfs_comp_type = [
             "xz", "gzip", "lzma", "lzo", "zstd"][self.comboCompression.currentIndex()]
 
-        self.project.iso_output_dir = unicode(self.le_iso_output_dir.text())
+        self.project.iso_output_dir = str(self.le_iso_output_dir.text())
         self.project.use_project_dir_as_output_dir = self.check_use_project_dir.isChecked()
 
         if self.checkCollection.isChecked():
@@ -653,13 +711,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
             Loads project information.
         """
-        self.lineTitle.setText(unicode(self.project.title))
-        self.lineRepository.setText(unicode(self.project.repo_uri))
-        self.lineWorkFolder.setText(unicode(self.project.work_dir))
-        self.lineLiveIsoRepo.setText(unicode(self.project.live_repo_uri))
-        self.lineReleaseFiles.setText(unicode(self.project.release_files))
-        self.linePluginPackage.setText(unicode(self.project.plugin_package))
-        self.lineParameters.setText(unicode(self.project.extra_params))
+        self.lineTitle.setText(str(self.project.title))
+        self.lineRepository.setText(str(self.project.repo_uri))
+        self.lineWorkFolder.setText(str(self.project.work_dir))
+        self.lineLiveIsoRepo.setText(str(self.project.live_repo_uri))
+        self.lineReleaseFiles.setText(str(self.project.release_files))
+        self.linePluginPackage.setText(str(self.project.plugin_package))
+        self.lineParameters.setText(str(self.project.extra_params))
         self.comboType.setCurrentIndex(
             ["install", "live"].index(self.project.type))
         self.comboCompression.setCurrentIndex(
@@ -667,7 +725,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.project.squashfs_comp_type))
 
         self.check_use_project_dir.setChecked(self.project.use_project_dir_as_output_dir)
-        self.le_iso_output_dir.setText(unicode(self.project.iso_output_dir))
+        self.le_iso_output_dir.setText(str(self.project.iso_output_dir))
 
         self.listPackageCollection.clear()
         if self.project.package_collections:
@@ -803,8 +861,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             for component in missing_components:
                 if component in self.project.selected_components:
                     self.project.selected_components.remove(component)
-                    self.project.selected_install_image_components.remove(
-                        component)
             return self.updateRepo(update_repo=False)
             # self.updateRepo(update_repo=False)
 
@@ -814,8 +870,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             for package in missing_packages:
                 if package in self.project.selected_packages:
                     self.project.selected_packages.remove(package)
-                    self.project.selected_install_image_packages.remove(
-                        package)
             return self.updateRepo(update_repo=False)
 
         self.progress.finished()

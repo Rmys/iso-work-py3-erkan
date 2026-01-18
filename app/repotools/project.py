@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
 # Copyright (C) 2005-2010 TUBITAK/UEKAE
@@ -17,7 +17,7 @@ import hashlib
 import platform
 import piksemel
 
-import packages
+from . import packages
 from app.repotools.packages import PackageCollection, PackageSet
 
 
@@ -232,13 +232,13 @@ class Project:
         # Open and parse project file filename
         try:
             doc = piksemel.parse(filename)
-        except OSError, e:
+        except OSError as e:
             if e.errno == 2:
                 raise ExProjectMissing
             raise
         except piksemel.ParseError:
             raise ExProjectBogus
-        if doc.name() != "PardusmanProject":
+        if doc.name() != "PisimanProject":
             raise ExProjectBogus
 
         self.reset()
@@ -290,7 +290,7 @@ class Project:
                     selectedPackages.append(tag.firstChild().data())
                 for tag in node.tags("Package"):
                     allPackages.append(tag.firstChild().data())
-                # print repoURI, "\n", selectedComponents, "\n", selectedPackages, "\n", allPackages
+                # print(repoURI, "\n", selectedComponents, "\n", selectedPackages, "\n", allPackages)
                 return (repoURI, selectedComponents,
                     selectedPackages, allPackages)
             return None
@@ -301,8 +301,8 @@ class Project:
             if node:
                 for translation in node.tags("Translation"):
                     translations[translation.getAttribute("language")] = (
-                        unicode(translation.getTagData("Title")),
-                        unicode(translation.getTagData("Description")))
+                        str(translation.getTagData("Title")),
+                        str(translation.getTagData("Description")))
                 return translations
             return None
 
@@ -377,10 +377,14 @@ class Project:
             self.selected_components.sort()
             self.selected_packages += self.selected_install_image_packages
             self.selected_packages.sort()
+        else:
+            self.selected_install_image_components = []
+            self.selected_install_image_packages = []
+            self.all_install_image_packages = []
 
     def save(self, filename=None):
         # Save the data into filename as pardusman project file
-        doc = piksemel.newDocument("PardusmanProject")
+        doc = piksemel.newDocument("PisimanProject")
 
         doc.setAttribute("type", self.type)
         doc.setAttribute("compression", str(self.squashfs_comp_type))
@@ -499,7 +503,7 @@ class Project:
         # Write the file
         if not filename:
             filename = self.filename
-        f = file(filename, "w")
+        f = open(filename, "w")
         f.write(doc.toPrettyString())
         f.close()
 
@@ -525,12 +529,17 @@ class Project:
 
     def _get_dir(self, name, clean=False):
         dirname = os.path.join(self.work_dir, name)
-        if os.path.exists(dirname):
-            if clean:
-                os.system('rm -rf "%s"' % dirname)
-                os.makedirs(dirname)
-        else:
-            os.makedirs(dirname)
+        if clean and os.path.exists(dirname):
+            # Agresif temizlik: Alt mount noktalarını sırayla ayır
+            for sub in ['dev/pts', 'dev', 'proc', 'sys']:
+                sub_path = os.path.join(dirname, sub)
+                if os.path.exists(sub_path):
+                    os.system('umount -l "%s" > /dev/null 2>&1' % sub_path)
+            
+            # Ana dizini temizle
+            os.system('rm -rf "%s"' % dirname)
+        
+        os.makedirs(dirname, exist_ok=True)
         return dirname
 
     def get_repo(self, console=None, update_repo=False):
@@ -612,6 +621,10 @@ class Project:
 
         packages.sort()
         self.all_install_image_packages = packages
+
+        # If InstallImagePackages was empty/missing, fall back to all_packages
+        if not self.all_install_image_packages:
+            self.all_install_image_packages = self.all_packages
 
     def image_repo_dir(self, clean=False):
         return self._get_dir("image_repo", clean)

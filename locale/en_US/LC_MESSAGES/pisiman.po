@@ -1,0 +1,114 @@
+# English translation for Pisiman (default/fallback)
+# Copyright (C) 2026 Pisi Linux
+# This file is distributed under the same license as the Pisiman package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Pisiman 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-18 23:00+0300\n"
+"PO-Revision-Date: 2026-01-18 23:00+0300\n"
+"Last-Translator: \n"
+"Language-Team: English\n"
+"Language: en_US\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+# Main menu items
+msgid "File"
+msgstr "File"
+
+msgid "Open Project"
+msgstr "Open Project"
+
+msgid "Save Project"
+msgstr "Save Project"
+
+msgid "Quit"
+msgstr "Quit"
+
+msgid "Project"
+msgstr "Project"
+
+msgid "Packages..."
+msgstr "Packages..."
+
+msgid "Languages..."
+msgstr "Languages..."
+
+msgid "Make Repo"
+msgstr "Make Repo"
+
+msgid "Make Image"
+msgstr "Make Image"
+
+msgid "Make ISO"
+msgstr "Make ISO"
+
+# Buttons
+msgid "Add"
+msgstr "Add"
+
+msgid "Remove"
+msgstr "Remove"
+
+msgid "Up"
+msgstr "Up"
+
+msgid "Down"
+msgstr "Down"
+
+msgid "OK"
+msgstr "OK"
+
+msgid "Cancel"
+msgstr "Cancel"
+
+msgid "Browse..."
+msgstr "Browse..."
+
+# Messages
+msgid "Check repo before download.\\nIf the repo is checked, there are no lost packages."
+msgstr "Check repo before download.\\nIf the repo is checked, there are no lost packages."
+
+msgid "Unable to load package index. URL is wrong, or file is corrupt."
+msgstr "Unable to load package index. URL is wrong, or file is corrupt."
+
+msgid "Package index has errors."
+msgstr "Package index has errors."
+
+msgid "There are missing components. Removing."
+msgstr "There are missing components. Removing."
+
+msgid "There are missing packages. Removing."
+msgstr "There are missing packages. Removing."
+
+msgid "Select Collection Icon"
+msgstr "Select Collection Icon"
+
+msgid "Image Files"
+msgstr "Image Files"
+
+# Package dialog
+msgid "Search"
+msgstr "Search"
+
+msgid "Components"
+msgstr "Components"
+
+msgid "All Packages"
+msgstr "All Packages"
+
+# Progress
+msgid "Stop"
+msgstr "Stop"
+
+msgid "Making repository..."
+msgstr "Making repository..."
+
+msgid "Making image..."
+msgstr "Making image..."
+
+msgid "Making ISO..."
+msgstr "Making ISO..."

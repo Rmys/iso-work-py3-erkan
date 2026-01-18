@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
 # Copyright (C) 2005-2009, TUBITAK/UEKAE
@@ -13,7 +13,7 @@
 
 import os
 import sys
-import urllib2
+import urllib.request as urllib2
 import requests
 import piksemel
 import random
@@ -25,7 +25,7 @@ try:
 except:
     pass
 
-from utility import xterm_title
+from .utility import xterm_title
 
 
 class Console:
@@ -38,6 +38,49 @@ class Console:
 
     def finished(self):
         sys.stdout.write("\n")
+
+
+class CycleException(Exception):
+    def __init__(self, cycle):
+        self.cycle = cycle
+
+
+class Digraph:
+    def __init__(self):
+        self.edges = {}
+        self.nodes = set()
+
+    def add_node(self, node):
+        self.nodes.add(node)
+
+    def add_edge(self, u, v):
+        self.add_node(u)
+        self.add_node(v)
+        if u not in self.edges:
+            self.edges[u] = []
+        self.edges[u].append(v)
+
+    def dfs(self):
+        visited = set()
+        stack = set()
+        for node in list(self.nodes):
+            if node not in visited:
+                self._dfs_visit(node, visited, stack, [])
+
+    def _dfs_visit(self, u, visited, stack, path):
+        visited.add(u)
+        stack.add(u)
+        path.append(u)
+
+        if u in self.edges:
+            for v in self.edges[u]:
+                if v in stack:
+                    cycle = path[path.index(v):]
+                    raise CycleException(cycle)
+                if v not in visited:
+                    self._dfs_visit(v, visited, stack, list(path))
+
+        stack.remove(u)
 
 
 class ExPisiIndex(Exception):
@@ -119,7 +162,7 @@ def fetch_uri(base_uri, cache_dir, filename, console=None, update_repo=False):
         os.system("mkdir -p %s" % filedir)
 
         if base_uri.startswith("file://"):
-            output = open(path, "w")
+            output = open(path, "wb")
             total_size = int(connection.info()['Content-Length'])
             size = 0
             while size < total_size:
@@ -128,7 +171,7 @@ def fetch_uri(base_uri, cache_dir, filename, console=None, update_repo=False):
                 size += len(data)
                 if console:
                     console.progress("Downloaded %d of %d bytes\
-                    " % (size, total_size), 100 * size / total_size)
+                    " % (size, total_size), 100 * size // total_size)
             output.close()
         else:
             written = 0
@@ -138,7 +181,7 @@ def fetch_uri(base_uri, cache_dir, filename, console=None, update_repo=False):
                     written += len(chunk)
                     if console:
                         console.progress("Downloaded %d of %d bytes\
-                        " % (written, size), 100 * written / size)
+                        " % (written, size), 100 * written // size)
         connection.close()
         if console:
             console.finished()
@@ -238,8 +281,8 @@ class Package:
                 self.description = tag.firstChild().data()
         deps = node.getTag('RuntimeDependencies')
         if deps:
-            self.depends = map(
-                lambda x: x.firstChild().data(), deps.tags('Dependency'))
+            self.depends = list(map(
+                lambda x: x.firstChild().data(), deps.tags('Dependency')))
             for anyDeps in deps.tags("AnyDependency"):
                 self.depends.append(anyDeps.getTagData("Dependency"))
         else:
@@ -290,8 +333,8 @@ class Repository:
                          self.index_name, console, update_repo)
         if path.endswith(".bz2"):
             import bz2
-            data = open(path).read()
-            data = bz2.decompress(data)
+            data = open(path, "rb").read()
+            data = bz2.decompress(data).decode("utf-8")
             doc = piksemel.parseString(data)
         elif path.endswith(".xz"):
             try:
@@ -301,8 +344,8 @@ class Repository:
                 try a different index format.")
                 return
 
-            data = open(path).read()
-            data = lzma.decompress(data)
+            data = open(path, "rb").read()
+            data = lzma.decompress(data).decode("utf-8")
             doc = piksemel.parseString(data)
         else:
             doc = piksemel.parse(path)
@@ -326,7 +369,6 @@ class Repository:
                 self.components[p.component].append(p.name)
             else:
                 self.components[p.component] = []
-        from pisi.graph import Digraph, CycleException
         dep_graph = Digraph()
         for name in self.packages:
             p = self.packages[name]
@@ -346,8 +388,8 @@ class Repository:
                               self.index_name, None, False)
         if indexpath.endswith(".bz2"):
             import bz2
-            data = open(indexpath).read()
-            data = bz2.decompress(data)
+            data = open(indexpath, "rb").read()
+            data = bz2.decompress(data).decode("utf-8")
             doc_index = piksemel.parseString(data)
         elif indexpath.endswith(".xz"):
             try:
@@ -357,8 +399,8 @@ class Repository:
                 or try a different index format.")
                 return
 
-            data = open(indexpath).read()
-            data = lzma.decompress(data)
+            data = open(indexpath, "rb").read()
+            data = lzma.decompress(data).decode("utf-8")
             doc_index = piksemel.parseString(data)
         else:
             doc_index = piksemel.parse(indexpath)
@@ -384,15 +426,14 @@ class Repository:
             cached = fetch_uri(self.base_uri, self.cache_dir, package.uri, console)
             subpath = os.path.dirname(package.uri)
             if not os.path.exists(os.path.join(path, subpath, os.path.basename(cached))):
-                if not os.path.exists(os.path.join(path, subpath)):
-                    os.makedirs(os.path.join(path, subpath))
+                os.makedirs(os.path.join(path, subpath), exist_ok=True)
                 os.symlink(cached, os.path.join(path, subpath, os.path.basename(cached)))
             index += 1
         index = self.make_index(package_list)
         import bz2
-        data = bz2.compress(index)
+        data = bz2.compress(index.encode("utf-8"))
         import hashlib
-        f = open(os.path.join(path, "%s-index.xml.bz2") % index_name, "w")
+        f = open(os.path.join(path, "%s-index.xml.bz2") % index_name, "wb")
         f.write(data)
         f.close()
         f = open(os.path.join(path, "%s-index.xml.bz2.sha1sum") % index_name, "w")
@@ -417,14 +458,14 @@ class Repository:
                 translationTag.insertTag("title").insertData(translation[0])
                 translationTag.insertTag("description").insertData(translation[1])
 
-        f = open(os.path.join(path, "collection.xml"), "w")
+        f = open(os.path.join(path, "collection.xml"), "w", encoding="utf-8")
         f.write(doc.toPrettyString())
         f.close()
 
         import hashlib
         f = open(os.path.join(path, "collection.xml.sha1sum"), "w")
         s = hashlib.sha1()
-        s.update(doc.toPrettyString())
+        s.update(doc.toPrettyString().encode("utf-8"))
         f.write(s.hexdigest())
         f.close()
 

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
 # Copyright (C) 2005-2009, TUBITAK/UEKAE
@@ -12,11 +12,8 @@
 #
 
 # Qt
-from PyQt5.QtCore import QEventLoop
-#from PyQt5.QtWidgets import QDialog
-
-from PyQt5.QtWidgets import QProgressDialog
-from PyQt5.QtCore import QCoreApplication
+from PyQt6.QtCore import QEventLoop, QCoreApplication
+from PyQt6.QtWidgets import QProgressDialog
 
 class Progress:
     def __init__(self, parent):
@@ -27,19 +24,19 @@ class Progress:
     def started(self, title):
         self.dialog = QProgressDialog(title, "Stop", 0, 0, self.parent)
         self.dialog.setGeometry(
-            self.parent.x() + (self.parent.width()/2 - 150),
-            self.parent.y() + (self.parent.height()/2 - 40),
+            self.parent.x() + (self.parent.width() // 2 - 150),
+            self.parent.y() + (self.parent.height() // 2 - 40),
             300, 80)
         self.dialog.setCancelButton(None)
         self.dialog.show()
-        QCoreApplication.processEvents(QEventLoop.AllEvents)
+        QCoreApplication.processEvents(QEventLoop.ProcessEventsFlag.AllEvents)
 
     def progress(self, msg, percent):
         self.dialog.setLabelText(msg)
         # otherwise KProgressDialog automatically closes itself, sigh
         if percent < 100:
             self.dialog.setValue(percent)
-        QCoreApplication.processEvents(QEventLoop.AllEvents)
+        QCoreApplication.processEvents(QEventLoop.ProcessEventsFlag.AllEvents)
 
     def finished(self):
         if self.dialog:

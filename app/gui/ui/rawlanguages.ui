@@ -72,8 +72,8 @@
       <string/>
      </property>
      <property name="icon">
-      <iconset resource="raw.qrc">
-       <normaloff>:/raw/pics/go-next.png</normaloff>:/raw/pics/go-next.png</iconset>
+      <iconset>
+       <normaloff>pics/go-next.png</normaloff>pics/go-next.png</iconset>
      </property>
     </widget>
    </item>
@@ -89,8 +89,8 @@
       <string/>
      </property>
      <property name="icon">
-      <iconset resource="raw.qrc">
-       <normaloff>:/raw/pics/go-up.png</normaloff>:/raw/pics/go-up.png</iconset>
+      <iconset>
+       <normaloff>pics/go-up.png</normaloff>pics/go-up.png</iconset>
      </property>
     </widget>
    </item>
@@ -106,8 +106,8 @@
       <string/>
      </property>
      <property name="icon">
-      <iconset resource="raw.qrc">
-       <normaloff>:/raw/pics/go-previous.png</normaloff>:/raw/pics/go-previous.png</iconset>
+      <iconset>
+       <normaloff>pics/go-previous.png</normaloff>pics/go-previous.png</iconset>
      </property>
     </widget>
    </item>
@@ -123,8 +123,8 @@
       <string/>
      </property>
      <property name="icon">
-      <iconset resource="raw.qrc">
-       <normaloff>:/raw/pics/go-down.png</normaloff>:/raw/pics/go-down.png</iconset>
+      <iconset>
+       <normaloff>pics/go-down.png</normaloff>pics/go-down.png</iconset>
      </property>
     </widget>
    </item>
@@ -176,8 +176,5 @@
   <tabstop>downButton</tabstop>
   <tabstop>buttonBox</tabstop>
  </tabstops>
- <resources>
-  <include location="raw.qrc"/>
- </resources>
  <connections/>
 </ui>

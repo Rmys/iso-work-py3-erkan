@@ -1,79 +1,108 @@
-<!-- iso-work README -->
+# Pisiman (Pisi ISO Creator)
 
-iso-work
-========
-
-Pisi Linux ISO oluşturma araçları ve dosyaları.
-
-Not: Bu proje Python 2 ile geliştirilmiş ve python2 ile çalıştırılmalıdır. Sisteminizde python2 yüklü olduğundan emin olun.
-
-required_packages.txt dosyasındaki programların sisteminizde kurulu olması gerekmektedir.  
-Otomatik kurulum ve çalıştırma için pisiman dizininde:
-```sh
-sh ./run.sh
-```
-komutunu çalıştırmanız yeterli. Not: konsolda kurulum ve çalıştırma için sudo ile parola istenmektedir.  
-
-Çalıştırmadan önce NOT dosyasını okuyun.
+[Turkish](#türkçe) | [English](#english)
 
 ---
 
-Aşağıda proje içeriği, kullanım ve önemli noktalar özetlenmiştir.
+## Türkçe
 
-Özet
-----
-Bu depo, Pisi GNU/Linux için canlı (live) ve kurulum (install) ISO'ları ile ilgili repo/image oluşturma araçlarını içerir. Ana yapı app/repotools/ dizininde bulunur; arayüz ise pisiman.py tarafından başlatılır.
+Pisi Linux için ISO imajları oluşturma araçları ve GUI arayüzü.
 
-Hızlı başlatma
---------------
-1. Host sistemi için gerekli paketleri yükleyin (required_packages.txt içeriğine bakın).  
-2. GUI veya yardımcı betikleri inşa etmek için (varsa):
+### Özet
+Pisiman, Pisi Linux tabanlı canlı (live) ve kurulum (install) ISO'ları hazırlamak için kullanılan kapsamlı bir araç setidir. Modernize edilmiş yapısı ile artık **Python 3** ve **PyQt6** kullanmaktadır.
+
+### Özellikler
+- **Modern GUI:** PyQt6 tabanlı, dinamik arayüz yükleme (`uic`) mimarisi.
+- **Sadeleştirilmiş XML:** Proje yapılandırmaları `PisimanProject` kök etiketi altında, tekilleştirilmiş paket listeleri ile yönetilir.
+- **Dinamik Kaynak Yönetimi:** Arayüz derlemesi gerektirmez, doğrudan `.ui` dosyalarını kullanır. İkonlar doğrudan `ui/pics` klasöründen yüklenir.
+- **Gelişmiş ISO Araçları:** EFI desteği, hybrid ISO (`xorriso`), overlayfs desteği ve modüler yapı.
+
+### Gereksinimler
+- Python 3.11+
+- PyQt6
+- Pisi (Paket yönetimi için)
+- xorriso, squashfs-tools, mtools, grub, dosfstools
+- Diğer bağımlılıklar için `required_packages.txt` dosyasına göz atın.
+
+### Kurulum ve Kullanım
+
+#### Başlatma
+Uygulamayı GUI ile başlatmak için:
 ```sh
-./make.sh
+sudo ./pisiman.py
 ```
-3. CLI ile imaj oluşturmak için:
+
+#### Komut Satırı Kullanımı
+CLI üzerinden imaj oluşturmak için:
 ```sh
-python pisiman.py make <project.xml>
+sudo ./pisiman.py make project-files/pisi-2.0-minimal.xml
 ```
-(Not: yukarıdaki komut python2 kullanılarak çalıştırılmalıdır: python2 pisiman.py ...)
-4. GUI ile: app/gui/main.py üzerinden projeyi açın ve "Make Repo / Make Image / Make ISO" işlemlerini kullanın.
 
-Önemli betikler ve modüller
---------------------------
-- Proje modeli: app/repotools/project.py — proje yükleme/kaydetme, dizin ve yardımcılar.
-- Temel iş akışları (app/repotools/maker.py):
-  - make_repos: repo hazırlama
-  - make_image: imaj oluşturma (chroot, configure pending)
-  - squash_image: squashfs oluşturma
-  - make_iso: ISO oluşturma, EFI/isolinux ayarları
-  - setup_isolinux / setup_efi: önyükleyici kurulumları
-  - mkinitcpio: initramfs oluşturma yardımcıları
-  - load_grub_params: GRUB yapılandırma şablonları
-- GUI: app/gui/main.py — Qt tabanlı arayüz.
+#### Klasör Yapısı
+- `app/repotools/`: ISO oluşturma mantığı (maker, project, iso_ops, image_ops vb.)
+- `app/gui/`: PyQt6 arayüz dosyaları.
+- `app/gui/ui/`: Arayüz tasarım dosyaları (.ui) ve görseller (pics/).
+- `project-files/`: Örnek proje XML dosyaları.
 
-Tipik iş akışı
---------------
-- project XML dosyasını düzenleyin veya oluşturun (project-files dizini örnekleri).
-- GUI: projeyi açın, paketleri kontrol edin, "Make Repo / Make Image / Make ISO" tıklayın.
-- CLI: python pisiman.py make <project.xml>
+### Modernizasyon Notları
+Bu proje üzerinde yapılan son güncellemeler şunları içerir:
+- Python 2'den Python 3'e tam geçiş.
+- PyQt5'ten **PyQt6**'ya teknoloji yükseltmesi.
+- `uic.loadUi` ile dinamik arayüz yükleme (derleme gerektirmez).
+- `raw.qrc` ve `raw_rc.py` bağımlılıklarının kaldırılması.
+- XML yapısında `InstallImagePackages` ve `PackageSelection` bölümlerinin birleştirilmesi.
+- Proje isimlendirmesinin `PisimanProject` olarak standardize edilmesi.
 
-Önemli dosyalar
----------------
-- pisiman.py — ana giriş noktasına yakın betik
-- app/repotools/maker.py — yapım mantığı
-- app/repotools/project.py — proje model ve dizin yardımcıları
-- app/gui/main.py — GUI
-- pisiman/required_packages.txt — host bağımlılıkları
-- make.sh — UI / build yardımcı betiği
+---
 
-Notlar & Hata giderme
----------------------
-- Birçok işlem mount, chroot, pisi, xorriso gibi sistem komutları çalıştırır — gerekli yetkiler (root) ile çalıştırın.
-- Hata durumunda çıktıdaki mesajları kontrol edin; work_dir içindeki finished.txt ve log dosyaları hangi aşamaya gelindiğini gösterir.
-- Paket/repoyla ilgili sorunlarda proje içindeki repo cache ve work_dir yollarını kontrol edin.
+## English
 
-Katkıda bulunma
----------------
-- Yapı mantığı için app/repotools; UI için app/gui üzerinde değişiklik yapın.
-- Yeni host bağımlılığı eklenirse pisiman/required_packages.txt güncellensin.
-- UI değişikliklerinden sonra ./make.sh çalıştırın (varsa).
+ISO image creation tools and GUI for Pisi Linux.
+
+### Overview
+Pisiman is a comprehensive toolset used to prepare live and install ISOs based on Pisi Linux. With its modernized structure, it now uses **Python 3** and **PyQt6**.
+
+### Features
+- **Modern GUI:** PyQt6-based, dynamic interface loading (`uic`) architecture.
+- **Simplified XML:** Project configurations are managed under the `PisimanProject` root tag, with unified package lists.
+- **Dynamic Resource Management:** No interface compilation required, uses `.ui` files directly. Icons are loaded directly from the `ui/pics` folder.
+- **Advanced ISO Tools:** EFI support, hybrid ISO (`xorriso`), overlayfs support, and modular structure.
+
+### Requirements
+- Python 3.11+
+- PyQt6
+- Pisi (For package management)
+- xorriso, squashfs-tools, mtools, grub, dosfstools
+- Check `required_packages.txt` for other dependencies.
+
+### Installation and Usage
+
+#### Launching
+To start the application with GUI:
+```sh
+sudo ./pisiman.py
+```
+
+#### Command Line Usage
+To create an image via CLI:
+```sh
+sudo ./pisiman.py make project-files/pisi-2.0-minimal.xml
+```
+
+#### Directory Structure
+- `app/repotools/`: ISO creation logic (maker, project, iso_ops, image_ops, etc.)
+- `app/gui/`: PyQt6 interface files.
+- `app/gui/ui/`: Interface design files (.ui) and images (pics/).
+- `project-files/`: Example project XML files.
+
+### Modernization Notes
+Recent updates to this project include:
+- Full migration from Python 2 to Python 3.
+- Technology upgrade from PyQt5 to **PyQt6**.
+- Dynamic UI loading with `uic.loadUi` (no compilation needed).
+- Removal of `raw.qrc` and `raw_rc.py` dependencies.
+- Merging `InstallImagePackages` and `PackageSelection` sections in XML.
+- Standardization of project naming as `PisimanProject`.
+
+---
+*Pisiman is developed by the Pisi Linux community.*

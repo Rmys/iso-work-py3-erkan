@@ -1,82 +1,62 @@
-#!/usr/bin/python
-# -*- coding:utf-8 -*-
-
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (C) 2005-2009, TUBITAK/UEKAE
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 2 of the License, or (at your option)
+# any later version.
+#
+# Please read the COPYING file.
+#
 import os
 import json
-from collections import OrderedDict
-
-# from PyQt5.QtCore import QCoreApplication
-from PyQt5.QtWidgets import QWidget, QFileDialog, QTableWidgetItem
-
-from ui.repowidget import Ui_RepoWidget
+# from PyQt6.QtCore import QCoreApplication
+from PyQt6.QtWidgets import QWidget, QFileDialog, QTableWidgetItem
+from PyQt6 import uic
 
 # _ = lambda x: QCoreApplication.translate
 
 
-class RepoWidget(QWidget, Ui_RepoWidget):
+class RepoWidget(QWidget):
     def __init__(self, parent=None, *args):
         super(QWidget, self).__init__(parent)
-        self.setupUi(self)
+        ui_path = os.path.join(os.path.dirname(__file__), "ui", "repowidget.ui")
+        uic.loadUi(ui_path, self)
         
         self.pb_repo_open.clicked.connect(self.open)
         
-        self.__json_file = ""
-        self.__repos = {}
-        
-        self.pb_repo_up.clicked.connect(self.up)
+        self.repo_list = []
+        self.repo_path = None
         
     def open(self):
-        # os.getenv("HOME")
-        self.__json_file = QFileDialog.getOpenFileName(self, "Open Repo File", ".", "JSON Files (*.json)")[0]
-        
-        self.load_repos(self.__json_file)
-        
-    def load_repos(self, json_file):
-        try:
-            f = open(json_file)
-            self.__repos = json.load(f, object_pairs_hook=OrderedDict)
-            print(self.__repos)
-            f.close()
-        except Exception as e:
-            print(e)
+        filename, _ = QFileDialog.getOpenFileName(self, "Open Repository JSON", os.getcwd(), "JSON files (*.json)")
+        if filename:
+            self.repo_path = filename
+            self.load()
+            
+    def load(self):
+        if not self.repo_path:
             return
-        
-        for name, addr in self.__repos.items():
-            self.tw_repo.setRowCount(self.tw_repo.rowCount()+1)
             
-            item = QTableWidgetItem(name)
-            self.tw_repo.setItem(self.tw_repo.rowCount()-1, 0, item)
+        with open(self.repo_path, "r") as f:
+            self.repo_list = json.load(f)
             
-            item = QTableWidgetItem(addr)
-            self.tw_repo.setItem(self.tw_repo.rowCount()-1, 1, item)
+        self.table_repo.setRowCount(len(self.repo_list))
+        for i, repo in enumerate(self.repo_list):
+            self.table_repo.setItem(i, 0, QTableWidgetItem(repo["name"]))
+            self.table_repo.setItem(i, 1, QTableWidgetItem(repo["url"]))
             
-    def up(self):
-        current_row = self.tw_repo.currentRow()
-        
-        if current_row == 0: return
-    
-        
-        curr_items = (self.tw_repo.item(current_row, 0),
-                      self.tw_repo.item(current_row, 1))
-        
-        prev_items = (self.tw_repo.item(current_row -1, 0),
-                      self.tw_repo.item(current_row -1, 1))
-        
-        self.tw_repo.removeRow(current_row-1)
-        self.tw_repo.insertRow(current_row)
-        #self.tw_repo.setItem(current_row - 1, 0, curr_items[0])
-        #self.tw_repo.setItem(current_row - 1, 1, curr_items[1])
-        
-        self.tw_repo.setItem(current_row, 0, prev_items[0])
-        self.tw_repo.setItem(current_row, 1, prev_items[1])
-
-if __name__ == "__main__":
-    import sys
-    from PyQt5.QtWidgets import QApplication
-    
-    app = QApplication(sys.argv)
-
-    w = RepoWidget()
-    w.show()
-
-    sys.exit(app.exec_())
+    def save(self):
+        if not self.repo_path:
+            return
+            
+        self.repo_list = []
+        for i in range(self.table_repo.rowCount()):
+            name = self.table_repo.item(i, 0).text()
+            url = self.table_repo.item(i, 1).text()
+            self.repo_list.append({"name": name, "url": url})
+            
+        with open(self.repo_path, "w") as f:
+            json.dump(self.repo_list, f, indent=4)

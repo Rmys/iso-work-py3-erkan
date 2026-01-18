@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
 # Copyright (C) 2005-2009, TUBITAK/UEKAE
@@ -12,11 +12,11 @@
 #
 
 # Qt
-from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QDialog, QListWidgetItem
+import os
+from PyQt6 import uic
+from PyQt6.QtCore import pyqtSignal
+from PyQt6.QtWidgets import QDialog, QListWidgetItem
 
-# UI
-from app.gui.ui.languages import Ui_LanguagesDialog
 
 LANGUAGES = {
     "ca_ES": "Catalan",
@@ -44,10 +44,11 @@ class LanguageWidgetItem(QListWidgetItem):
         self.setText(label)
 
 
-class LanguagesDialog(QDialog, Ui_LanguagesDialog):
+class LanguagesDialog(QDialog):
     def __init__(self, parent, languages=[]):
         QDialog.__init__(self, parent)
-        self.setupUi(self)
+        ui_path = os.path.join(os.path.dirname(__file__), "ui", "rawlanguages.ui")
+        uic.loadUi(ui_path, self)
 
         # Selected languages
         self.languages = languages
@@ -98,7 +99,7 @@ class LanguagesDialog(QDialog, Ui_LanguagesDialog):
     def accept(self):
         self.languages = []
         selected = self.selectedListWidget
-        for index in xrange(selected.count()):
+        for index in range(selected.count()):
             item = selected.item(index)
             self.languages.append(item.code)
         QDialog.accept(self)
@@ -109,7 +110,7 @@ class LanguagesDialog(QDialog, Ui_LanguagesDialog):
         for code in self.languages:
             item = LanguageWidgetItem(code, LANGUAGES[code])
             selected.addItem(item)
-        for code, label in LANGUAGES.iteritems():
+        for code, label in LANGUAGES.items():
             if code not in self.languages:
                 item = LanguageWidgetItem(code, label)
                 available.addItem(item)

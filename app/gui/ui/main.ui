@@ -14,8 +14,8 @@
    <string>Pardusman</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="raw.qrc">
-    <normaloff>:/raw/pics/pardusman.png</normaloff>:/raw/pics/pardusman.png</iconset>
+   <iconset>
+    <normaloff>pics/pardusman.png</normaloff>pics/pardusman.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_5">
@@ -327,8 +327,8 @@
   </widget>
   <action name="actionNew">
    <property name="icon">
-    <iconset resource="raw.qrc">
-     <normaloff>:/raw/pics/document-new.png</normaloff>:/raw/pics/document-new.png</iconset>
+    <iconset>
+     <normaloff>pics/document-new.png</normaloff>pics/document-new.png</iconset>
    </property>
    <property name="text">
     <string>New</string>
@@ -336,8 +336,8 @@
   </action>
   <action name="actionOpen">
    <property name="icon">
-    <iconset resource="raw.qrc">
-     <normaloff>:/raw/pics/document-open.png</normaloff>:/raw/pics/document-open.png</iconset>
+    <iconset>
+     <normaloff>pics/document-open.png</normaloff>pics/document-open.png</iconset>
    </property>
    <property name="text">
     <string>Open...</string>
@@ -345,8 +345,8 @@
   </action>
   <action name="actionSave">
    <property name="icon">
-    <iconset resource="raw.qrc">
-     <normaloff>:/raw/pics/document-save.png</normaloff>:/raw/pics/document-save.png</iconset>
+    <iconset>
+     <normaloff>pics/document-save.png</normaloff>pics/document-save.png</iconset>
    </property>
    <property name="text">
     <string>Save</string>
@@ -354,8 +354,8 @@
   </action>
   <action name="actionSaveAs">
    <property name="icon">
-    <iconset resource="raw.qrc">
-     <normaloff>:/raw/pics/document-save-as.png</normaloff>:/raw/pics/document-save-as.png</iconset>
+    <iconset>
+     <normaloff>pics/document-save-as.png</normaloff>pics/document-save-as.png</iconset>
    </property>
    <property name="text">
     <string>Save As...</string>
@@ -363,8 +363,8 @@
   </action>
   <action name="actionExit">
    <property name="icon">
-    <iconset resource="raw.qrc">
-     <normaloff>:/raw/pics/application-exit.png</normaloff>:/raw/pics/application-exit.png</iconset>
+    <iconset>
+     <normaloff>pics/application-exit.png</normaloff>pics/application-exit.png</iconset>
    </property>
    <property name="text">
     <string>Exit</string>
@@ -372,8 +372,8 @@
   </action>
   <action name="actionUpdateRepo">
    <property name="icon">
-    <iconset resource="raw.qrc">
-     <normaloff>:/raw/pics/view-refresh.png</normaloff>:/raw/pics/view-refresh.png</iconset>
+    <iconset>
+     <normaloff>pics/view-refresh.png</normaloff>pics/view-refresh.png</iconset>
    </property>
    <property name="text">
     <string>Update Repo</string>
@@ -384,8 +384,8 @@
   </action>
   <action name="actionPackages">
    <property name="icon">
-    <iconset resource="raw.qrc">
-     <normaloff>:/raw/pics/applications-other.png</normaloff>:/raw/pics/applications-other.png</iconset>
+    <iconset>
+     <normaloff>pics/applications-other.png</normaloff>pics/applications-other.png</iconset>
    </property>
    <property name="text">
     <string>Packages...</string>
@@ -393,8 +393,8 @@
   </action>
   <action name="actionInstallationImagePackages">
    <property name="icon">
-    <iconset resource="raw.qrc">
-     <normaloff>:/raw/pics/applications-other.png</normaloff>:/raw/pics/applications-other.png</iconset>
+    <iconset>
+     <normaloff>pics/applications-other.png</normaloff>pics/applications-other.png</iconset>
    </property>
    <property name="text">
     <string>Installation Image Packages...</string>
@@ -402,8 +402,8 @@
   </action>
   <action name="actionLanguages">
    <property name="icon">
-    <iconset resource="raw.qrc">
-     <normaloff>:/raw/pics/applications-education-language.png</normaloff>:/raw/pics/applications-education-language.png</iconset>
+    <iconset>
+     <normaloff>pics/applications-education-language.png</normaloff>pics/applications-education-language.png</iconset>
    </property>
    <property name="text">
     <string>Languages...</string>
@@ -411,8 +411,8 @@
   </action>
   <action name="actionMakeImage">
    <property name="icon">
-    <iconset resource="raw.qrc">
-     <normaloff>:/raw/pics/media-optical.png</normaloff>:/raw/pics/media-optical.png</iconset>
+    <iconset>
+     <normaloff>pics/media-optical.png</normaloff>pics/media-optical.png</iconset>
    </property>
    <property name="text">
     <string>Make Image</string>
@@ -463,8 +463,5 @@
   <tabstop>pushRemoveCollection</tabstop>
   <tabstop>pushSetDefaultCollection</tabstop>
  </tabstops>
- <resources>
-  <include location="raw.qrc"/>
- </resources>
  <connections/>
 </ui>

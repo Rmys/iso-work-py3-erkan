@@ -1,0 +1,114 @@
+# Turkish translation for Pisiman
+# Copyright (C) 2026 Pisi Linux
+# This file is distributed under the same license as the Pisiman package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Pisiman 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-18 23:00+0300\n"
+"PO-Revision-Date: 2026-01-18 23:00+0300\n"
+"Last-Translator: \n"
+"Language-Team: Turkish\n"
+"Language: tr_TR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+# Main menu items
+msgid "File"
+msgstr "Dosya"
+
+msgid "Open Project"
+msgstr "Proje Aç"
+
+msgid "Save Project"
+msgstr "Projeyi Kaydet"
+
+msgid "Quit"
+msgstr "Çıkış"
+
+msgid "Project"
+msgstr "Proje"
+
+msgid "Packages..."
+msgstr "Paketler..."
+
+msgid "Languages..."
+msgstr "Diller..."
+
+msgid "Make Repo"
+msgstr "Repo Oluştur"
+
+msgid "Make Image"
+msgstr "İmaj Oluştur"
+
+msgid "Make ISO"
+msgstr "ISO Oluştur"
+
+# Buttons
+msgid "Add"
+msgstr "Ekle"
+
+msgid "Remove"
+msgstr "Kaldır"
+
+msgid "Up"
+msgstr "Yukarı"
+
+msgid "Down"
+msgstr "Aşağı"
+
+msgid "OK"
+msgstr "Tamam"
+
+msgid "Cancel"
+msgstr "İptal"
+
+msgid "Browse..."
+msgstr "Gözat..."
+
+# Messages
+msgid "Check repo before download.\\nIf the repo is checked, there are no lost packages."
+msgstr "İndirmeden önce repo'yu kontrol edin.\\nRepo kontrol edildiyse, kayıp paket yoktur."
+
+msgid "Unable to load package index. URL is wrong, or file is corrupt."
+msgstr "Paket indeksi yüklenemedi. URL yanlış veya dosya bozuk."
+
+msgid "Package index has errors."
+msgstr "Paket indeksinde hatalar var."
+
+msgid "There are missing components. Removing."
+msgstr "Eksik bileşenler var. Kaldırılıyor."
+
+msgid "There are missing packages. Removing."
+msgstr "Eksik paketler var. Kaldırılıyor."
+
+msgid "Select Collection Icon"
+msgstr "Koleksiyon İkonu Seç"
+
+msgid "Image Files"
+msgstr "Resim Dosyaları"
+
+# Package dialog
+msgid "Search"
+msgstr "Ara"
+
+msgid "Components"
+msgstr "Bileşenler"
+
+msgid "All Packages"
+msgstr "Tüm Paketler"
+
+# Progress
+msgid "Stop"
+msgstr "Durdur"
+
+msgid "Making repository..."
+msgstr "Depo oluşturuluyor..."
+
+msgid "Making image..."
+msgstr "İmaj oluşturuluyor..."
+
+msgid "Making ISO..."
+msgstr "ISO oluşturuluyor..."

@@ -52,8 +52,8 @@
         <string>Remove Icon</string>
        </property>
        <property name="icon">
-        <iconset resource="raw.qrc">
-         <normaloff>:/raw/pics/edit-delete.png</normaloff>:/raw/pics/edit-delete.png</iconset>
+        <iconset>
+         <normaloff>pics/edit-delete.png</normaloff>pics/edit-delete.png</iconset>
        </property>
       </widget>
      </item>
@@ -63,8 +63,8 @@
         <string>Add Icon</string>
        </property>
        <property name="icon">
-        <iconset resource="raw.qrc">
-         <normaloff>:/raw/pics/list-add.png</normaloff>:/raw/pics/list-add.png</iconset>
+        <iconset>
+         <normaloff>pics/list-add.png</normaloff>pics/list-add.png</iconset>
        </property>
       </widget>
      </item>
@@ -112,8 +112,5 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="raw.qrc"/>
- </resources>
  <connections/>
 </ui>

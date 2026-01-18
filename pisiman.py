@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
 # Copyright (C) 2005-2009, TUBITAK/UEKAE
@@ -42,7 +42,7 @@ def maker(op, project_file):
                 print("ERROR: package index has errors. Cyclic dependency found:\n  %s." % cycle)
                 return
             except packages.ExPackageMissing as e:
-                print("ERROR: Package index has errors. '%s' depends on non-existing '%s'." % e.args)
+                print("ERROR: Package index has errors. '%s' depends on non-existing '%s'." % (e.args))
                 return
             missing_components, missing_packages = project.get_missing()
 
@@ -87,7 +87,7 @@ def maker(op, project_file):
         maker.make_iso(project)
 
     end = time.time()
-    print("Total time is", end - start, "seconds.")
+    print("Total time is %s seconds." % (end - start))
 
 
 def usage(app):
@@ -108,7 +108,7 @@ def main(args):
     elif len(args) == 3:
         maker(args[1], args[2])
     else:
-        import app.gui as gui
+        from app import gui
         gui.gui(args)
 
 

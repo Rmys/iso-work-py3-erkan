@@ -170,8 +170,8 @@
              <string/>
             </property>
             <property name="icon">
-             <iconset resource="raw.qrc">
-              <normaloff>:/raw/pics/view-preview.png</normaloff>:/raw/pics/view-preview.png</iconset>
+             <iconset>
+              <normaloff>pics/view-preview.png</normaloff>pics/view-preview.png</iconset>
             </property>
            </widget>
           </item>
@@ -187,8 +187,8 @@
              <string/>
             </property>
             <property name="icon">
-             <iconset resource="raw.qrc">
-              <normaloff>:/raw/pics/edit-clear-locationbar-rtl.png</normaloff>:/raw/pics/edit-clear-locationbar-rtl.png</iconset>
+             <iconset>
+              <normaloff>pics/edit-clear-locationbar-rtl.png</normaloff>pics/edit-clear-locationbar-rtl.png</iconset>
             </property>
            </widget>
           </item>
@@ -260,8 +260,5 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="raw.qrc"/>
- </resources>
  <connections/>
 </ui>

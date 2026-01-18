@@ -14,8 +14,8 @@
    <string>Pisi Iso Creator</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="raw.qrc">
-    <normaloff>:/raw/pics/pisi-logo-magenta64x64.png</normaloff>:/raw/pics/pisi-logo-magenta64x64.png</iconset>
+   <iconset>
+    <normaloff>pics/pisi-logo-magenta64x64.png</normaloff>pics/pisi-logo-magenta64x64.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_5">
@@ -408,8 +408,8 @@ output dir</string>
   </widget>
   <action name="actionNew">
    <property name="icon">
-    <iconset resource="raw.qrc">
-     <normaloff>:/raw/pics/document-new.png</normaloff>:/raw/pics/document-new.png</iconset>
+    <iconset>
+     <normaloff>pics/document-new.png</normaloff>pics/document-new.png</iconset>
    </property>
    <property name="text">
     <string>New</string>
@@ -417,8 +417,8 @@ output dir</string>
   </action>
   <action name="actionOpen">
    <property name="icon">
-    <iconset resource="raw.qrc">
-     <normaloff>:/raw/pics/document-open.png</normaloff>:/raw/pics/document-open.png</iconset>
+    <iconset>
+     <normaloff>pics/document-open.png</normaloff>pics/document-open.png</iconset>
    </property>
    <property name="text">
     <string>Open...</string>
@@ -429,8 +429,8 @@ output dir</string>
   </action>
   <action name="actionSave">
    <property name="icon">
-    <iconset resource="raw.qrc">
-     <normaloff>:/raw/pics/document-save.png</normaloff>:/raw/pics/document-save.png</iconset>
+    <iconset>
+     <normaloff>pics/document-save.png</normaloff>pics/document-save.png</iconset>
    </property>
    <property name="text">
     <string>Save</string>
@@ -438,8 +438,8 @@ output dir</string>
   </action>
   <action name="actionSaveAs">
    <property name="icon">
-    <iconset resource="raw.qrc">
-     <normaloff>:/raw/pics/document-save-as.png</normaloff>:/raw/pics/document-save-as.png</iconset>
+    <iconset>
+     <normaloff>pics/document-save-as.png</normaloff>pics/document-save-as.png</iconset>
    </property>
    <property name="text">
     <string>Save As...</string>
@@ -447,8 +447,8 @@ output dir</string>
   </action>
   <action name="actionExit">
    <property name="icon">
-    <iconset resource="raw.qrc">
-     <normaloff>:/raw/pics/application-exit.png</normaloff>:/raw/pics/application-exit.png</iconset>
+    <iconset>
+     <normaloff>pics/application-exit.png</normaloff>pics/application-exit.png</iconset>
    </property>
    <property name="text">
     <string>Exit</string>
@@ -456,8 +456,8 @@ output dir</string>
   </action>
   <action name="actionUpdateRepo">
    <property name="icon">
-    <iconset resource="raw.qrc">
-     <normaloff>:/raw/pics/view-refresh.png</normaloff>:/raw/pics/view-refresh.png</iconset>
+    <iconset>
+     <normaloff>pics/view-refresh.png</normaloff>pics/view-refresh.png</iconset>
    </property>
    <property name="text">
     <string>Update Repo</string>
@@ -468,8 +468,8 @@ output dir</string>
   </action>
   <action name="actionPackages">
    <property name="icon">
-    <iconset resource="raw.qrc">
-     <normaloff>:/raw/pics/applications-other.png</normaloff>:/raw/pics/applications-other.png</iconset>
+    <iconset>
+     <normaloff>pics/applications-other.png</normaloff>pics/applications-other.png</iconset>
    </property>
    <property name="text">
     <string>Packages...</string>
@@ -477,8 +477,8 @@ output dir</string>
   </action>
   <action name="actionInstallationImagePackages">
    <property name="icon">
-    <iconset resource="raw.qrc">
-     <normaloff>:/raw/pics/applications-other.png</normaloff>:/raw/pics/applications-other.png</iconset>
+    <iconset>
+     <normaloff>pics/applications-other.png</normaloff>pics/applications-other.png</iconset>
    </property>
    <property name="text">
     <string>Installation Image Packages...</string>
@@ -486,8 +486,8 @@ output dir</string>
   </action>
   <action name="actionLanguages">
    <property name="icon">
-    <iconset resource="raw.qrc">
-     <normaloff>:/raw/pics/applications-education-language.png</normaloff>:/raw/pics/applications-education-language.png</iconset>
+    <iconset>
+     <normaloff>pics/applications-education-language.png</normaloff>pics/applications-education-language.png</iconset>
    </property>
    <property name="text">
     <string>Languages...</string>
@@ -495,8 +495,8 @@ output dir</string>
   </action>
   <action name="actionMakeImage">
    <property name="icon">
-    <iconset resource="raw.qrc">
-     <normaloff>:/raw/pics/media-optical.png</normaloff>:/raw/pics/media-optical.png</iconset>
+    <iconset>
+     <normaloff>pics/media-optical.png</normaloff>pics/media-optical.png</iconset>
    </property>
    <property name="text">
     <string>Make Image</string>
@@ -558,9 +558,6 @@ output dir</string>
   <tabstop>pushBrowseWorkFolder</tabstop>
   <tabstop>comboCompression</tabstop>
  </tabstops>
- <resources>
-  <include location="raw.qrc"/>
- </resources>
  <connections>
   <connection>
    <sender>check_use_project_dir</sender>

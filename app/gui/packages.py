@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
 # Copyright (C) 2005-2009, TUBITAK/UEKAE
@@ -12,12 +12,12 @@
 #
 
 # Qt
-from PyQt5.QtCore import pyqtSignal, Qt
-from PyQt5.QtWidgets import QDialog, QTreeWidgetItem
-from PyQt5.QtGui import QBrush, QColor
+import os
+from PyQt6 import uic
+from PyQt6.QtCore import pyqtSignal, Qt
+from PyQt6.QtWidgets import QDialog, QTreeWidgetItem
+from PyQt6.QtGui import QBrush, QColor
 
-# UI
-from app.gui.ui.packages import Ui_PackagesDialog
 
 
 class PackageWidgetItem(QTreeWidgetItem):
@@ -27,7 +27,7 @@ class PackageWidgetItem(QTreeWidgetItem):
         self.component = component
         self.required = False
 
-        self.setCheckState(0, Qt.Unchecked)
+        self.setCheckState(0, Qt.CheckState.Unchecked)
         self.setText(0, package.name)
         self.setText(1, "%.3f" % (package.size / 1024.0 / 1024.0))
         self.setText(2, package.version)
@@ -35,12 +35,12 @@ class PackageWidgetItem(QTreeWidgetItem):
 
     def setChecked(self, checked):
         if checked:
-            self.setCheckState(0, Qt.Checked)
+            self.setCheckState(0, Qt.CheckState.Checked)
         else:
-            self.setCheckState(0, Qt.Unchecked)
+            self.setCheckState(0, Qt.CheckState.Unchecked)
 
     def isChecked(self):
-        return self.checkState(0) == Qt.Checked
+        return self.checkState(0) == Qt.CheckState.Checked
 
     def setRequired(self, required):
         self.required = required
@@ -61,23 +61,24 @@ class ComponentWidgetItem(QTreeWidgetItem):
         QTreeWidgetItem.__init__(self, parent)
         self.component = component
 
-        self.setCheckState(0, Qt.Unchecked)
+        self.setCheckState(0, Qt.CheckState.Unchecked)
         self.setText(0, component)
 
     def setChecked(self, checked):
         if checked:
-            self.setCheckState(0, Qt.Checked)
+            self.setCheckState(0, Qt.CheckState.Checked)
         else:
-            self.setCheckState(0, Qt.Unchecked)
+            self.setCheckState(0, Qt.CheckState.Unchecked)
 
     def isChecked(self):
-        return self.checkState(0) == Qt.Checked
+        return self.checkState(0) == Qt.CheckState.Checked
 
 
-class PackagesDialog(QDialog, Ui_PackagesDialog):
+class PackagesDialog(QDialog):
     def __init__(self, parent, repo, packages=[], components=[]):
         QDialog.__init__(self, parent)
-        self.setupUi(self)
+        ui_path = os.path.join(os.path.dirname(__file__), "ui", "packages.ui")
+        uic.loadUi(ui_path, self)
 
         # Package repository
         self.repo = repo
@@ -98,10 +99,10 @@ class PackagesDialog(QDialog, Ui_PackagesDialog):
         self.comboFilter.currentIndexChanged[int].connect(self.slotComboFilter)
 
         # Package/Component changes
-        self.treeComponents.currentItemChanged[QTreeWidgetItem ,QTreeWidgetItem ].connect(self.slotSelectComponent)
-        self.treeComponents.itemClicked[QTreeWidgetItem , int].connect(self.slotClickComponent)
-        self.treePackages.currentItemChanged[QTreeWidgetItem ,QTreeWidgetItem ].connect(self.slotSelectPackage)
-        self.treePackages.itemClicked[QTreeWidgetItem , int].connect(self.slotClickPackage)
+        self.treeComponents.currentItemChanged[QTreeWidgetItem, QTreeWidgetItem].connect(self.slotSelectComponent)
+        self.treeComponents.itemClicked[QTreeWidgetItem, int].connect(self.slotClickComponent)
+        self.treePackages.currentItemChanged[QTreeWidgetItem, QTreeWidgetItem].connect(self.slotSelectPackage)
+        self.treePackages.itemClicked[QTreeWidgetItem, int].connect(self.slotClickPackage)
 
         self.subcomponents = False
         self.component_only = False
@@ -123,11 +124,11 @@ class PackagesDialog(QDialog, Ui_PackagesDialog):
                     item.setChecked(True)
 
         # Resize columns to their contents
-        for i in xrange(self.treePackages.columnCount()):
+        for i in range(self.treePackages.columnCount()):
             self.treePackages.resizeColumnToContents(i)
 
         # Sort by package name in ascending order
-        self.treePackages.sortByColumn(0, Qt.AscendingOrder)
+        self.treePackages.sortByColumn(0, Qt.SortOrder.AscendingOrder)
 
         # Components
         for name in self.repo.components:
@@ -136,7 +137,7 @@ class PackagesDialog(QDialog, Ui_PackagesDialog):
                 item.setChecked(True)
 
         # Sort by component name in ascending order
-        self.treeComponents.sortByColumn(0, Qt.AscendingOrder)
+        self.treeComponents.sortByColumn(0, Qt.SortOrder.AscendingOrder)
 
         # Draw selections
         self.updatePackages()
@@ -145,20 +146,20 @@ class PackagesDialog(QDialog, Ui_PackagesDialog):
         self.packages = []
         self.components = []
         self.all_packages = []
-        for index in xrange(self.treePackages.topLevelItemCount()):
+        for index in range(self.treePackages.topLevelItemCount()):
             item = self.treePackages.topLevelItem(index)
             if item.isChecked():
                 self.packages.append(item.package.name)
             if item.isRequired():
                 self.all_packages.append(item.package.name)
-        for index in xrange(self.treeComponents.topLevelItemCount()):
+        for index in range(self.treeComponents.topLevelItemCount()):
             item = self.treeComponents.topLevelItem(index)
             if item.isChecked():
                 self.components.append(item.component)
         QDialog.accept(self)
 
     def slotSearchPackage(self, text):
-        for index in xrange(self.treePackages.topLevelItemCount()):
+        for index in range(self.treePackages.topLevelItemCount()):
             item = self.treePackages.topLevelItem(index)
             if item.text(0).__contains__(text):
                 item.setHidden(False)
@@ -178,7 +179,7 @@ class PackagesDialog(QDialog, Ui_PackagesDialog):
         """
             Filters package list.
         """
-        for index in xrange(self.treePackages.topLevelItemCount()):
+        for index in range(self.treePackages.topLevelItemCount()):
             item = self.treePackages.topLevelItem(index)
             if selected_only:
                 if item.isChecked() or item.isRequired():
@@ -208,7 +209,7 @@ class PackagesDialog(QDialog, Ui_PackagesDialog):
         """
         if item.isChecked():
             if item.component not in self.components:
-                print item.text(0), "selected"
+                print(item.text(0), "selected")
                 self.components.append(item.component)
                 self.updatePackages()
         else:
@@ -228,7 +229,7 @@ class PackagesDialog(QDialog, Ui_PackagesDialog):
         """
         if item.isChecked():
             if item.package.name not in self.packages:
-                print item.text(0), "selected"
+                print(item.text(0), "selected")
                 self.packages.append(item.package.name)
                 self.updatePackages()
         else:
@@ -257,7 +258,7 @@ class PackagesDialog(QDialog, Ui_PackagesDialog):
                     if dep not in required_packages:
                         required_packages.append(dep)
 
-        for index in xrange(self.treePackages.topLevelItemCount()):
+        for index in range(self.treePackages.topLevelItemCount()):
             item = self.treePackages.topLevelItem(index)
             selected = item.package.name in self.packages
             required = item.package.name in required_packages
